@@ -2,7 +2,21 @@
  * Aplicacion Principal - Integracion de Modulos y UI
  */
 
-import { calcularProbabilidadDados, calcularPartidosTorneo, contarMultiplosMenores, calcularViajesMinimos } from "./modules/bairesdev.js";
+// NOTA: Si tus archivos estan directo en js/ (sin subcarpeta modules),
+// cambia "./modules/..." por "./bairesdev.js", "./cuadratica.js", etc.
+import {
+  calcularProbabilidadDados,
+  calcularPartidosTorneo,
+  contarMultiplosMenores,
+  calcularViajesMinimos,
+  contarDigito,
+  calcularEdadFutura,
+  calcularPesoRecipiente,
+  calcularDiferenciaIngreso,
+  calcularAhorroContado,
+  calcularAlquiler
+} from "./modules/bairesdev.js";
+
 import { resolverCuadratica, evaluarPolinomio } from "./modules/cuadratica.js";
 import { analizarSecuencia } from "./modules/secuencias.js";
 import { ejecutarSuiteCompleta } from "./modules/test-suite.js";
@@ -36,63 +50,67 @@ function initTabs() {
     });
   });
 }
-
 /* -------------------------------------------------------------
-   MODULO A: SIMULADOR BAIRESDEV
+   MODULO A: SIMULADOR BAIRESDEV (10 RETOS)
 ------------------------------------------------------------- */
 function initModuloA() {
-  // Reto 1: Dados
-  const btnDados = document.getElementById("btn-calc-dados");
-  const inputDados = document.getElementById("input-dados-suma");
-  const resDados = document.getElementById("res-dados");
+  const botones = document.querySelectorAll("#tab-modulo-a button");
 
-  btnDados?.addEventListener("click", () => {
+  // Helper para obtener los inputs y el cuadro de resultado de cada tarjeta
+  const obtenerElementos = (indice) => {
+    const btn = botones[indice];
+    if (!btn) return null;
+    const card = btn.parentElement;
+    return {
+      btn,
+      inputs: card.querySelectorAll("input"),
+      resBox: btn.nextElementSibling
+    };
+  };
+
+  // Reto 1: Probabilidad de Dados
+  const r1 = obtenerElementos(0);
+  r1?.btn.addEventListener("click", () => {
     try {
-      const suma = parseInt(inputDados.value, 10);
+      const suma = parseInt(r1.inputs[0].value, 10);
       const res = calcularProbabilidadDados(suma);
-      resDados.innerHTML = `Suma Objetivo: <strong>${suma}</strong><br>` +
-                           `Casos Favorables: <strong>${res.casosFavorables} / ${res.casosTotales}</strong><br>` +
-                           `Probabilidad Decimal: <strong>${res.probabilidad.toFixed(4)}</strong><br>` +
-                           `Porcentaje: <strong>${res.porcentaje}</strong>`;
+      r1.resBox.innerHTML = `Suma Objetivo: <strong>${suma}</strong><br>` +
+                            `Casos Favorables: <strong>${res.casosFavorables} / ${res.casosTotales}</strong><br>` +
+                            `Probabilidad Decimal: <strong>${res.probabilidad.toFixed(4)}</strong><br>` +
+                            `Porcentaje: <strong>${res.porcentaje}</strong>`;
     } catch (e) {
-      resDados.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r1.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 2: Torneo
-  const btnTorneo = document.getElementById("btn-calc-torneo");
-  const inputTorneo = document.getElementById("input-torneo-equipos");
-  const resTorneo = document.getElementById("res-torneo");
-
-  btnTorneo?.addEventListener("click", () => {
+  // Reto 2: Torneo Round-Robin
+  const r2 = obtenerElementos(1);
+  r2?.btn.addEventListener("click", () => {
     try {
-      const n = parseInt(inputTorneo.value, 10);
+      const n = parseInt(r2.inputs[0].value, 10);
       const partidos = calcularPartidosTorneo(n);
-      resTorneo.innerHTML = `Equipos participantes: <strong>${n}</strong><br>` +
+      r2.resBox.innerHTML = `Equipos participantes: <strong>${n}</strong><br>` +
                             `Partidos Totales C(${n}, 2): <strong>${partidos} partidos</strong>`;
     } catch (e) {
-      resTorneo.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r2.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 3: Divisores
-  const btnDiv = document.getElementById("btn-calc-div");
-  const inputLimite = document.getElementById("input-div-limite");
-  const inputDivisor = document.getElementById("input-div-divisor");
-  const resDiv = document.getElementById("res-div");
-
-  btnDiv?.addEventListener("click", () => {
+  // Reto 3: Multiplos Menores
+  const r3 = obtenerElementos(2);
+  r3?.btn.addEventListener("click", () => {
     try {
-      const lim = parseInt(inputLimite.value, 10);
-      const div = parseInt(inputDivisor.value, 10);
+      const lim = parseInt(r3.inputs[0].value, 10);
+      const div = parseInt(r3.inputs[1].value, 10);
       const cant = contarMultiplosMenores(lim, div);
-      resDiv.innerHTML = `Enteros en el rango [1, ${lim - 1}] divisibles por ${div}:<br>` +
-                         `Total: <strong>${cant} números</strong> (Calculado en tiempo O(1))`;
+      r3.resBox.innerHTML = `Enteros en el rango [1, ${lim - 1}] divisibles por ${div}:<br>` +
+                            `Total: <strong>${cant} números</strong> (Tiempo O(1))`;
     } catch (e) {
-      resDiv.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r3.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
-// Reto 4: Viajes Minimos (Logistica)
+
+  // Reto 4: Viajes Minimos (Logistica)
   const r4 = obtenerElementos(3);
   r4?.btn.addEventListener("click", () => {
     try {
@@ -403,4 +421,3 @@ function initModuloD() {
       : `<span class="badge-status fail">✖ ${suite.fallados} PRUEBA(S) FALLADA(S) • ${suite.pasados}/10 PASS</span>`;
   });
 }
-  
