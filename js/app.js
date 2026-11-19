@@ -363,6 +363,5 @@ function initModuloD() {
     } else {
       summaryBadges.innerHTML = `<span class="badge-status fail">✖ ${suite.fallados} PRUEBA(S) FALLADA(S) • ${suite.pasados}/10 PASS</span>`;
     }
-    feat(app): integrar modulos, eventos de UI y grafica en canvas
   });
 }
