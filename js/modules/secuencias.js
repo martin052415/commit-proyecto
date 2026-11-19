@@ -10,7 +10,9 @@
 export function analizarSecuencia(arr) {
   if (!Array.isArray(arr) || arr.length < 3) {
     throw new Error("Se requieren al menos 3 terminos para detectar un patron.");
+  
   }
+  feat(secuencias): implementar detector de secuencias del Modulo C
 
   const n = arr.length;
 
