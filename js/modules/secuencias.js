@@ -1,111 +1,118 @@
 /**
- * Modulo C: Detector y Analizador de Secuencias Numericas
+ * Modulo B: Motor de Ecuaciones Cuadraticas y Precision Numerica
+ * Resuelve ax^2 + bx + c = 0
  */
 
 /**
- * Analiza un arreglo numerico y predice el siguiente termino
- * @param {number[]} arr - Lista de al menos 3 numeros
- * @returns {object} Informacion del patron y siguiente valor
+ * Resuelve la ecuacion cuadratica ax^2 + bx + c = 0
+ * @param {number} a - Coeficiente cuadratico
+ * @param {number} b - Coeficiente lineal
+ * @param {number} c - Termino independiente
+ * @returns {object} Resultado con clasificacion, discriminante, vertice y raices
  */
-export function analizarSecuencia(arr) {
-  if (!Array.isArray(arr) || arr.length < 3) {
-    throw new Error("Se requieren al menos 3 terminos para detectar un patron.");
-  
-  }
-  feat(secuencias): implementar detector de secuencias del Modulo C
-
-  const n = arr.length;
-
-  // 1. Verificar Progresion Geometrica: ratio constante (r = arr[i+1] / arr[i])
-  let esGeometrica = true;
-  const r0 = arr[0] !== 0 ? arr[1] / arr[0] : null;
-
-  if (r0 !== null && Number.isFinite(r0)) {
-    for (let i = 1; i < n - 1; i++) {
-      if (arr[i] === 0 || Math.abs((arr[i + 1] / arr[i]) - r0) > 1e-6) {
-        esGeometrica = false;
-        break;
+export function resolverCuadratica(a, b, c) {
+  // -------------------------------------------------------------
+  // CASO DEGENERADO: a === 0 (CASCARITA / DESAFIO 2)
+  // -------------------------------------------------------------
+  if (Math.abs(a) < 1e-15) {
+    if (Math.abs(b) < 1e-15) {
+      if (Math.abs(c) < 1e-15) {
+        return {
+          tipo: "INFINITAS_SOLUCIONES",
+          descripcion: "Identidad trivial (0 = 0): infinitas soluciones",
+          raices: []
+        };
       }
-    }
-  } else {
-    esGeometrica = false;
-  }
-
-  if (esGeometrica) {
-    const siguiente = arr[n - 1] * r0;
-    return {
-      tipo: "GEOMETRICA",
-      descripcion: `Progresion Geometrica con razon constante r = ${r0}`,
-      razon: r0,
-      siguienteTermino: siguiente
-    };
-  }
-
-  // 2. Primeras Diferencias (Delta 1)
-  const d1 = [];
-  for (let i = 0; i < n - 1; i++) {
-    d1.push(arr[i + 1] - arr[i]);
-  }
-
-  // Verificar si d1 es constante (Progresion Aritmetica)
-  const d1Constante = d1.every(val => Math.abs(val - d1[0]) < 1e-6);
-  if (d1Constante) {
-    const siguiente = arr[n - 1] + d1[0];
-    return {
-      tipo: "ARITMETICA",
-      descripcion: `Progresion Aritmetica de 1er orden con diferencia d = ${d1[0]}`,
-      diferencia: d1[0],
-      siguienteTermino: siguiente
-    };
-  }
-
-  // 3. Segundas Diferencias (Delta 2)
-  const d2 = [];
-  for (let i = 0; i < d1.length - 1; i++) {
-    d2.push(d1[i + 1] - d1[i]);
-  }
-
-  // Verificar si d2 es constante (Secuencia Cuadratica de 2do Orden)
-  const d2Constante = d2.length > 0 && d2.every(val => Math.abs(val - d2[0]) < 1e-6);
-  if (d2Constante) {
-    const delta2 = d2[0];
-    const siguienteD1 = d1[d1.length - 1] + delta2;
-    const siguiente = arr[n - 1] + siguienteD1;
-    return {
-      tipo: "CUADRATICA_2DO_ORDEN",
-      descripcion: `Secuencia de 2do Orden (Diferencias crecientes con paso constante +${delta2})`,
-      segundaDiferencia: delta2,
-      siguienteDiferencia: siguienteD1,
-      siguienteTermino: siguiente
-    };
-  }
-
-  // 4. Patron Alternado o Progresion Decreciente Especial
-  // Ejemplo: 100, 93, 84, 73 (-7, -9, -11 => paso -2 en diferencias)
-  // O secuencia dual 6, 3, 12, 9, 36, 35
-  if (d1.length >= 3) {
-    const pasoDiferencias = d1[1] - d1[0];
-    let diferenciasEnProgresion = true;
-    for (let i = 1; i < d1.length - 1; i++) {
-      if (Math.abs((d1[i + 1] - d1[i]) - pasoDiferencias) > 1e-6) {
-        diferenciasEnProgresion = false;
-        break;
-      }
-    }
-    if (diferenciasEnProgresion) {
-      const siguienteD1 = d1[d1.length - 1] + pasoDiferencias;
-      const siguiente = arr[n - 1] + siguienteD1;
       return {
-        tipo: "DIFERENCIAS_PROGRESIVAS",
-        descripcion: `Diferencias sucesivas en progresion con variacion ${pasoDiferencias}`,
-        siguienteTermino: siguiente
+        tipo: "SIN_SOLUCION",
+        descripcion: "Contradiccion incompatible (c != 0 con a=0, b=0)",
+        raices: []
       };
     }
+    // Ecuacion lineal: bx + c = 0 => x = -c / b
+    const xLineal = -c / b;
+    return {
+      tipo: "LINEAL_DEGENERADA",
+      descripcion: "Ecuacion lineal degenerada (a = 0)",
+      raices: [xLineal],
+      vertice: null,
+      discriminante: null
+    };
   }
 
+  // Discriminante: Delta = b^2 - 4ac
+  const delta = b * b - 4 * a * c;
+
+  // Coordenadas del vertice (h, k)
+  const h = -b / (2 * a);
+  const k = a * h * h + b * h + c;
+
+  // -------------------------------------------------------------
+  // CASO 1: Raices complejas conjugadas (Delta < 0)
+  // -------------------------------------------------------------
+  if (delta < -1e-14) {
+    const parteReal = -b / (2 * a);
+    const parteImag = Math.sqrt(-delta) / (2 * a);
+    return {
+      tipo: "COMPLEJAS_CONJUGADAS",
+      descripcion: "Dos raices complejas conjugadas",
+      discriminante: delta,
+      vertice: { h, k },
+      raices: [
+        { real: parteReal, imag: Math.abs(parteImag), texto: `${parteReal.toFixed(4)} + ${Math.abs(parteImag).toFixed(4)}i` },
+        { real: parteReal, imag: -Math.abs(parteImag), texto: `${parteReal.toFixed(4)} - ${Math.abs(parteImag).toFixed(4)}i` }
+      ]
+    };
+  }
+
+  // -------------------------------------------------------------
+  // CASO 2: Raiz doble real (Delta === 0)
+  // -------------------------------------------------------------
+  if (Math.abs(delta) <= 1e-14) {
+    const xDoble = -b / (2 * a);
+    return {
+      tipo: "RAIZ_DOBLE",
+      descripcion: "Una raiz real doble",
+      discriminante: 0,
+      vertice: { h, k },
+      raices: [xDoble, xDoble]
+    };
+  }
+
+  // -------------------------------------------------------------
+  // CASO 3: Dos raices reales distintas (Delta > 0)
+  // -------------------------------------------------------------
+  // ATENCION ESTUDIANTE: AQUI APLICA LA CASCARITA NUMERICA (IEEE-754)
+  // La formula escolar naive:
+  //   x1 = (-b + sqrt(delta)) / (2*a)
+  //   x2 = (-b - sqrt(delta)) / (2*a)
+  // Falla por cancelacion catastrofica cuando b^2 >> 4*a*c (ej: a=1, b=1e8, c=1).
+  //
+  // Algoritmo numericamente estable (Citardauq / Muller):
+  //   sgn = b >= 0 ? 1 : -1
+  //   q = -0.5 * (b + sgn * Math.sqrt(delta))
+  //   x1 = q / a
+  //   x2 = c / q
+  // -------------------------------------------------------------
+  const sgn = b >= 0 ? 1 : -1;
+  const sqrtDelta = Math.sqrt(delta);
+  const q = -0.5 * (b + sgn * sqrtDelta);
+
+  const x1 = q / a;
+  const x2 = c / q;
+
   return {
-    tipo: "PATRON_COMPLEJO",
-    descripcion: "Patron no elemental o serie combinada",
-    siguienteTermino: null
+    tipo: "REALES_DISTINTAS",
+    descripcion: "Dos raices reales distintas",
+    discriminante: delta,
+    vertice: { h, k },
+    raices: [Math.max(x1, x2), Math.min(x1, x2)]
   };
+}
+
+/**
+ * Evalua el polinomio cuadratico f(x) = ax^2 + bx + c
+ */
+export function evaluarPolinomio(a, b, c, x) {
+  return a * x * x + b * x + c;
 }
