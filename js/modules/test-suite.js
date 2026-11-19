@@ -6,6 +6,7 @@ import { calcularProbabilidadDados, calcularPartidosTorneo, contarMultiplosMenor
 import { resolverCuadratica } from "./cuadratica.js";
 import { analizarSecuencia } from "./secuencias.js";
 
+test: agregar suite de 10 pruebas unitarias en el navegador
 /**
  * Compara dos numeros flotantes con tolerancia de error relativo/absoluto (Epsilon)
  */
