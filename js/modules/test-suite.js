@@ -1,112 +1,241 @@
 /**
- * Modulo C: Detector y Analizador de Secuencias Numericas
+ * Modulo D: Suite de Pruebas Unitarias Automatizadas
  */
+
+import { calcularProbabilidadDados, calcularPartidosTorneo, contarMultiplosMenores, calcularViajesMinimos } from "./bairesdev.js";
+import { resolverCuadratica } from "./cuadratica.js";
+import { analizarSecuencia } from "./secuencias.js";
 
 /**
- * Analiza un arreglo numerico y predice el siguiente termino
- * @param {number[]} arr - Lista de al menos 3 numeros
- * @returns {object} Informacion del patron y siguiente valor
+ * Compara dos numeros flotantes con tolerancia de error relativo/absoluto (Epsilon)
  */
-export function analizarSecuencia(arr) {
-  if (!Array.isArray(arr) || arr.length < 3) {
-    throw new Error("Se requieren al menos 3 terminos para detectar un patron.");
-  }
-    if (!arr.every(num => Number.isFinite(num))) {
-    throw new Error("Todos los terminos deben ser numeros validos.");
-  }
+function casiIguales(a, b, eps = 1e-7) {
+  if (a === b) return true;
+  const diff = Math.abs(a - b);
+  return diff < eps || diff / (Math.abs(a) + Math.abs(b)) < eps;
+}
 
-  const n = arr.length;
-
-  // 1. Verificar Progresion Geometrica: ratio constante (r = arr[i+1] / arr[i])
-  let esGeometrica = true;
-  const r0 = arr[0] !== 0 ? arr[1] / arr[0] : null;
-
-  if (r0 !== null && Number.isFinite(r0)) {
-    for (let i = 1; i < n - 1; i++) {
-      if (arr[i] === 0 || Math.abs((arr[i + 1] / arr[i]) - r0) > 1e-6) {
-        esGeometrica = false;
-        break;
-      }
-    }
-  } else {
-    esGeometrica = false;
-  }
-
-  if (esGeometrica) {
-    const siguiente = arr[n - 1] * r0;
-    return {
-      tipo: "GEOMETRICA",
-      descripcion: `Progresion Geometrica con razon constante r = ${r0}`,
-      razon: r0,
-      siguienteTermino: siguiente
-    };
-  }
-
-  // 2. Primeras Diferencias (Delta 1)
-  const d1 = [];
-  for (let i = 0; i < n - 1; i++) {
-    d1.push(arr[i + 1] - arr[i]);
-  }
-
-  // Verificar si d1 es constante (Progresion Aritmetica)
-  const d1Constante = d1.every(val => Math.abs(val - d1[0]) < 1e-6);
-  if (d1Constante) {
-    const siguiente = arr[n - 1] + d1[0];
-    return {
-      tipo: "ARITMETICA",
-      descripcion: `Progresion Aritmetica de 1er orden con diferencia d = ${d1[0]}`,
-      diferencia: d1[0],
-      siguienteTermino: siguiente
-    };
-  }
-
-  // 3. Segundas Diferencias (Delta 2)
-  const d2 = [];
-  for (let i = 0; i < d1.length - 1; i++) {
-    d2.push(d1[i + 1] - d1[i]);
-  }
-
-  // Verificar si d2 es constante (Secuencia Cuadratica de 2do Orden)
-  const d2Constante = d2.length > 0 && d2.every(val => Math.abs(val - d2[0]) < 1e-6);
-  if (d2Constante) {
-    const delta2 = d2[0];
-    const siguienteD1 = d1[d1.length - 1] + delta2;
-    const siguiente = arr[n - 1] + siguienteD1;
-    return {
-      tipo: "CUADRATICA_2DO_ORDEN",
-      descripcion: `Secuencia de 2do Orden (Diferencias crecientes con paso constante +${delta2})`,
-      segundaDiferencia: delta2,
-      siguienteDiferencia: siguienteD1,
-      siguienteTermino: siguiente
-    };
-  }
-
-  // 4. Patron Alternado o Progresion Decreciente Especial
-  // Ejemplo: 100, 93, 84, 73 (-7, -9, -11 => paso -2 en diferencias)
-  // O secuencia dual 6, 3, 12, 9, 36, 35
-  if (d1.length >= 3) {
-    const pasoDiferencias = d1[1] - d1[0];
-    let diferenciasEnProgresion = true;
-    for (let i = 1; i < d1.length - 1; i++) {
-      if (Math.abs((d1[i + 1] - d1[i]) - pasoDiferencias) > 1e-6) {
-        diferenciasEnProgresion = false;
-        break;
-      }
-    }
-    if (diferenciasEnProgresion) {
-      const siguienteD1 = d1[d1.length - 1] + pasoDiferencias;
-      const siguiente = arr[n - 1] + siguienteD1;
+/**
+ * Lista de las 10 pruebas unitarias requeridas por el proyecto
+ */
+export const tests = [
+  {
+    id: 1,
+    nombre: "Probabilidad Suma de 2 Dados = 7",
+    categoria: "BairesDev",
+    esCascarita: false,
+    ejecutar: () => {
+      const res = calcularProbabilidadDados(7);
+      const ok = res.casosFavorables === 6 && casiIguales(res.probabilidad, 6 / 36);
       return {
-        tipo: "DIFERENCIAS_PROGRESIVAS",
-        descripcion: `Diferencias sucesivas en progresion con variacion ${pasoDiferencias}`,
-        siguienteTermino: siguiente
+        pass: ok,
+        detalle: `Esperado: 6/36 (0.1667). Obtenido: ${res.casosFavorables}/${res.casosTotales} (${res.probabilidad.toFixed(4)})`
+      };
+    }
+  },
+  {
+    id: 2,
+    nombre: "Torneo Round-Robin de 4 Equipos",
+    categoria: "BairesDev",
+    esCascarita: false,
+    ejecutar: () => {
+      const res = calcularPartidosTorneo(4);
+      const ok = res === 6;
+      return {
+        pass: ok,
+        detalle: `Esperado: 6 partidos. Obtenido: ${res} partidos.`
+      };
+    }
+  },
+  {
+    id: 3,
+    nombre: "Multiplos Positivos Menores a 904 Divisibles por 3",
+    categoria: "BairesDev",
+    esCascarita: false,
+    ejecutar: () => {
+      const res = contarMultiplosMenores(904, 3);
+      const ok = res === 301;
+      return {
+        pass: ok,
+        detalle: `Esperado: 301. Obtenido: ${res}.`
+      };
+    }
+  },
+  {
+    id: 4,
+    nombre: "Minimo de Viajes para 17 Botellas (Capacidad 3)",
+    categoria: "BairesDev",
+    esCascarita: false,
+    ejecutar: () => {
+      const res = calcularViajesMinimos(17, 3);
+      const ok = res === 6;
+      return {
+        pass: ok,
+        detalle: `Esperado: 6 viajes. Obtenido: ${res} viajes.`
+      };
+    }
+  },
+  {
+    id: 5,
+    nombre: "Cuadratica con Raices Reales Distintas (x^2 - 5x + 6 = 0)",
+    categoria: "Algebra",
+    esCascarita: false,
+    ejecutar: () => {
+      const res = resolverCuadratica(1, -5, 6);
+      const ok = res.tipo === "REALES_DISTINTAS" &&
+                 casiIguales(res.raices[0], 3) &&
+                 casiIguales(res.raices[1], 2);
+      return {
+        pass: ok,
+        detalle: `Esperado: [3, 2]. Obtenido: [${res.raices.map(r => r.toFixed(2)).join(", ")}]`
+      };
+    }
+  },
+  {
+    id: 6,
+    nombre: "Cuadratica con Raiz Doble (x^2 - 4x + 4 = 0)",
+    categoria: "Algebra",
+    esCascarita: false,
+    ejecutar: () => {
+      const res = resolverCuadratica(1, -4, 4);
+      const ok = res.tipo === "RAIZ_DOBLE" && casiIguales(res.raices[0], 2);
+      return {
+        pass: ok,
+        detalle: `Esperado: x = 2 (raiz doble). Obtenido: x = ${res.raices[0]}`
+      };
+    }
+  },
+  {
+    id: 7,
+    nombre: "Cuadratica Complejas Conjugadas (x^2 + 2x + 5 = 0)",
+    categoria: "Algebra",
+    esCascarita: false,
+    ejecutar: () => {
+      const res = resolverCuadratica(1, 2, 5);
+      const ok = res.tipo === "COMPLEJAS_CONJUGADAS" &&
+                 casiIguales(res.raices[0].real, -1) &&
+                 casiIguales(res.raices[0].imag, 2);
+      return {
+        pass: ok,
+        detalle: `Esperado: -1 +/- 2i. Obtenido: ${res.raices[0].texto}, ${res.raices[1].texto}`
+      };
+    }
+  },
+  {
+    id: 8,
+    nombre: "Cascarita 1: Cancelacion Catastrofica (a=1, b=10^8, c=1)",
+    categoria: "Cascarita Numérica",
+    esCascarita: true,
+    ejecutar: () => {
+      const a = 1, b = 1e8, c = 1;
+      const res = resolverCuadratica(a, b, c);
+
+      // Raices teoricas exactas: x1 approx -1e8, x2 approx -1e-8
+      // La formula naive evalua x2 a 0 debido a cancelacion catastrofica en flotante.
+      const rPequeña = Math.min(Math.abs(res.raices[0]), Math.abs(res.raices[1]));
+      const noEsCero = rPequeña > 0 && Math.abs(rPequeña - 1e-8) < 1e-12;
+
+      return {
+        pass: noEsCero,
+        detalle: noEsCero
+          ? `Superado: Raiz menor calculada con precision: ${rPequeña.toExponential(4)} (cercana a 1.0000e-8)`
+          : `Fallo de Cancelacion Catastrofica: la raiz menor dio ${rPequeña} en vez de ~1e-8. Requiere formula de Citardauq.`
+      };
+    }
+  },
+  {
+    id: 9,
+    nombre: "Cascarita 2: Ecuacion Cuadratica Degenerada (a=0, 4x - 8 = 0)",
+    categoria: "Cascarita Numérica",
+    esCascarita: true,
+    ejecutar: () => {
+      const res = resolverCuadratica(0, 4, -8);
+      const ok = res.tipo === "LINEAL_DEGENERADA" && casiIguales(res.raices[0], 2);
+      return {
+        pass: ok,
+        detalle: ok
+          ? `Superado: Detectada ecuacion lineal degenerada con solucion x = 2.`
+          : `Fallo: El algoritmo intento dividir entre 2*a (0) o arrojo NaN/Infinity.`
+      };
+    }
+  },
+  {
+    id: 10,
+    nombre: "Cascarita 3: Comparacion Segura IEEE-754 ($2.80 respecto a $8.75)",
+    categoria: "Cascarita Numérica",
+    esCascarita: true,
+    ejecutar: () => {
+      // 2.80 / 8.75 * 100 produce 32.00000000000001 en JS
+      const calculo = (2.80 / 8.75) * 100;
+      const comparacionNaive = (calculo === 32); // Da false en JS
+      const comparacionRobusta = Math.abs(calculo - 32) < Number.EPSILON * 100;
+
+      return {
+        pass: comparacionRobusta,
+        detalle: `Calculo JS crudo: ${calculo}. Comparacion estricta === da: ${comparacionNaive}. Comparacion segura con Epsilon da: ${comparacionRobusta}.`
+      };
+    }
+    },
+  {
+    id: 11,
+    nombre: "Detector rechaza valores invalidos",
+    categoria: "Secuencias",
+    esCascarita: false,
+    ejecutar: () => {
+      let rechazoCorrecto = false;
+
+      try {
+        analizarSecuencia([2, NaN, 6]);
+      } catch (error) {
+        rechazoCorrecto = true;
+      }
+
+      return {
+        pass: rechazoCorrecto,
+        detalle: rechazoCorrecto
+          ? "Correcto: rechazo el valor NaN."
+          : "Error: acepto un valor invalido."
       };
     }
   }
+];
+
+/**
+ * Ejecuta todas las pruebas y devuelve un reporte estructurado
+ */
+export function ejecutarSuiteCompleta() {
+  const resultados = tests.map(t => {
+    try {
+      const res = t.ejecutar();
+      return {
+        id: t.id,
+        nombre: t.nombre,
+        categoria: t.categoria,
+        esCascarita: t.esCascarita,
+        pass: res.pass,
+        detalle: res.detalle
+      };
+    } catch (err) {
+      return {
+        id: t.id,
+        nombre: t.nombre,
+        categoria: t.categoria,
+        esCascarita: t.esCascarita,
+        pass: false,
+        detalle: `Excepcion de ejecucion: ${err.message}`
+      };
+    }
+  });
+
+  const total = resultados.length;
+  const pasados = resultados.filter(r => r.pass).length;
+  const fallados = total - pasados;
 
   return {
-    tipo: "PATRON_COMPLEJO",
-    descripcion: "Patron no elemental o serie combinada",
-    siguienteTermino: null
+    total,
+    pasados,
+    fallados,
+    todosAprobados: fallados === 0,
+    resultados
   };
 }
