@@ -23,7 +23,6 @@ export function resolverCuadratica(a, b, c) {
           raices: []
         };
       }
-      feat(cuadratica): implementar solucionador cuadratico estable con casos borde
       return {
         tipo: "SIN_SOLUCION",
         descripcion: "Contradiccion incompatible (c != 0 con a=0, b=0)",
