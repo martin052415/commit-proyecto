@@ -1,4 +1,5 @@
 # Suite Matematica y Algoritmica (Proyecto Integrador)
+docs: agregar README con modulos, estructura y rubrica
 
 Evaluacion practica de logica computacional, algebra y precision numerica.
 Proyecto integrador para trabajo en casa con control de versiones en GitHub y despliegue en GitHub Pages.
