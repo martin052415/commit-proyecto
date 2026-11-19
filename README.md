@@ -1,8 +1,5 @@
 # Suite Matemática y Algorítmica (Proyecto Integrador)
 
-[![pages-build-deployment](https://github.com/St7v07/suite-matematica-web/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/St7v07/suite-matematica-web/actions/workflows/pages/pages-build-deployment)
-
-🌐 **Demo en vivo:** https://St7v07.github.io/suite-matematica-web/
 
 Aplicación web interactiva que reúne retos de lógica (BairesDev), un solucionador de ecuaciones cuadráticas con gráfica, un detector de secuencias y una suite de pruebas unitarias en el navegador.
 
