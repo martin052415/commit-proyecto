@@ -3,22 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suite Matematica y Logica | Proyecto Integrador</title>
+  <title>Suite Matemática y Lógica | Proyecto Integrador</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <!-- Header Principal -->
   <header class="header">
-    <feat(ui): agregar estructura HTML con navegacion por pestanas>
     <div class="container header-container">
       <div class="brand">
         <span class="badge">PROYECTO INTEGRADOR</span>
-        <h1>Suite Matematica &amp; Algoritmica</h1>
-        <p class="subtitle">Logica Computacional, Algebra Cuadratica y Precision Numerica</p>
+        <h1>Suite Matemática &amp; Algorítmica</h1>
+        <p class="subtitle">Lógica Computacional, Álgebra Cuadrática y Precisión Numérica</p>
       </div>
       <div class="student-info">
-        <div class="info-tag"><strong>Estudiante:</strong> <span class="placeholder">[martin]</span></div>
-        <div class="info-tag"><strong>Repositorio:</strong> <span class="placeholder">[git: tu-usuario/suite-logica]</span></div>
+        <div class="info-tag"><strong>Estudiante:</strong> <span class="placeholder">Yiber Esteban Doncel Zapata</span></div>
+        <div class="info-tag"><strong>Repositorio:</strong> <span>yiber1205/Commits-Proyecto-Web</span></div>
       </div>
     </div>
   </header>
@@ -123,11 +122,14 @@
       <div class="section-header"><h2>Modulo C: Detector de Secuencias</h2><p>Identificador de progresiones aritmeticas, geometricas y de segundo orden.</p></div>
       <div class="card">
         <div class="form-group"><label for="input-secuencia">Secuencia separada por comas:</label><input type="text" id="input-secuencia" value="7, 11, 16, 22, 29"></div>
+        <p class="subtitle">Ingresa al menos tres números separados por comas para identificar el patrón matemático.</p>
         <div class="presets-row">
           <span>Presets:</span>
           <button class="btn-chip" data-seq="7, 11, 16, 22, 29">Cuadratica (+4, +5, +6...)</button>
           <button class="btn-chip" data-seq="100, 93, 84, 73">Diferencias (-7, -9, -11...)</button>
           <button class="btn-chip" data-seq="4, 16, 64, 256">Geometrica (*4)</button>
+          <button class="btn-chip" data-seq="81, 27, 9, 3, 1">Geometrica (/3)</button>
+          <button class="btn-chip" data-seq="2, 4, 6, 8, 10">Aritmetica (+2)</button>
           <button class="btn-chip" data-seq="6, 3, 12, 9, 36, 35">Dual (/2, *4, -3, *4, -1...)</button>
         </div>
         <button class="btn btn-primary" id="btn-analizar-secuencia">Analizar Patron</button>
